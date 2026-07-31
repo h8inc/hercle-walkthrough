@@ -63,6 +63,9 @@
   ol.qs{list-style:none;counter-reset:none}
   ol.qs li{font-size:12px;color:#d8c9a8;line-height:1.55;padding:6px 8px 6px 8px;margin:4px 0;border-left:3px solid var(--amber);background:var(--amber-soft);border-radius:0 8px 8px 0}
   ol.qs li b{color:var(--amber);font-weight:700;margin-right:4px}
+  ol.qs li.done{border-left-color:var(--green);background:var(--green-soft);color:#a9c8d6}
+  ol.qs li.done b{color:var(--green)}
+  .later{display:inline-block;font-size:9px;font-weight:800;letter-spacing:.5px;padding:2px 7px;border-radius:9px;background:#2a3238;color:var(--dim);margin-left:8px;vertical-align:2px}
 
   /* ---------- RIGHT PANEL ---------- */
   #right{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:20px;background:radial-gradient(1200px 600px at 60% 20%,#0b0e10 0%,var(--bg) 60%)}
@@ -158,7 +161,7 @@
 </header>
 <main>
   <div id="left">
-    <p class="intro-note">Low-fidelity on purpose. <b>the Blockstream app is a self-custody wallet</b>; Hercle is the regulated VASP behind the cash account. Everything solid is what we intend to build; everything <b style="color:var(--amber)">dashed amber</b> is a question we need answered before we can commit the flow. Click a step to walk its screens.</p>
+    <p class="intro-note">Low-fidelity on purpose. <b>the Blockstream app is a self-custody wallet</b>; Hercle is the regulated VASP behind the cash account. Everything solid is what we intend to build; everything <b style="color:var(--amber)">dashed amber</b> is a question we need answered before we can commit the flow. Click a step to walk its screens. <b style="color:var(--green)">First release scope: steps 0–4</b> — buy &amp; settle to self-custody. Sell and withdraw are shown for the full picture but target a later release.</p>
     <div class="step" data-step="0">
       <button class="step-head"><span class="num">0</span><div><h3>The shape of the integration</h3><p class="tag">Who does what — before we talk screens</p></div><span class="chev">›</span></button>
       <div class="step-body">
@@ -173,7 +176,7 @@
         <h4 class="hq">For Hercle</h4>
         <ol class="qs">
           <li><b>0.1</b> Does this account-of-record model match how you see the partnership — your customer, our interface?</li>
-          <li><b>0.2</b> Integration surface: REST + webhooks? Is a sandbox available today?</li>
+          <li class="done"><b>0.2</b> RESOLVED — sandbox is available and we have access. Remaining detail: webhook coverage (see 2.4 and 3.4).</li>
           <li><b>0.3</b> We'd be your first consumer-wallet integration — which parts of this walkthrough don't exist on your side yet?</li>
         </ol>
       </div>
@@ -195,7 +198,7 @@
           <li><b>1.1</b> What's required to open an account, and when — at creation, or can name / DOB / address / phone / tax ID wait for KYC?</li>
           <li><b>1.2</b> Is the account created silently via API, or does the user get a direct relationship — credentials, transactional emails? Who sends what?</li>
           <li><b>1.3</b> Which agreements must the user accept, and can we present them in-app on your behalf?</li>
-          <li><b>1.4</b> Eligibility at this stage — excluded countries, age, anything checked before KYC?</li>
+          <li><b>1.4</b> Supported countries: we don't want to geolocate everyone just to gate the entry point. Our proposal: onboarding simply states who can access (“available in … — more countries coming soon”). Which jurisdictions are live at launch?</li>
           <li><b>1.5</b> Can an account sit unverified or unfunded indefinitely — any dormancy / expiry rules?</li>
         </ol>
       </div>
@@ -204,20 +207,20 @@
     <div class="step" data-step="2">
       <button class="step-head"><span class="num">2</span><div><h3>Verify identity (KYC)</h3><p class="tag">We run Sumsub — you rely on it</p></div><span class="chev">›</span></button>
       <div class="step-body">
-        <p class="desc">We already integrate <b>Sumsub</b> for verification. The user verifies once, in our app; we pass the result to you so the cash account activates for funding and withdrawal. The whole step hinges on one question: <b>can you rely on our Sumsub verification</b> (applicant reuse / share token), or does the user have to KYC twice?</p>
+        <p class="desc">We already integrate <b>Sumsub</b> for verification. The user verifies once, in our app; we pass the result to you so the cash account activates for funding and withdrawal. This step is well defined as long as <b>we generate the links and operate our own Sumsub account</b>: once the user completes the flow, we trigger applicant sharing via Sumsub token sharing so Hercle can access the applicant and run their compliance checks.</p>
         <div class="chips"></div>
         <h4>What we assume</h4>
         <ul class="assume">
-          <li>One KYC, done in-app via Sumsub SDK; Hercle receives the applicant data or an attestation with a reference.</li>
+          <li>One KYC, done in-app on our Sumsub account; on completion we trigger applicant sharing to Hercle via Sumsub token sharing.</li>
           <li>KYC level maps to limits (fund / buy / withdraw) that we surface in the UI.</li>
           <li>Status changes reach us by webhook so the app reflects them live.</li>
         </ul>
         <h4 class="hq">For Hercle</h4>
         <ol class="qs">
-          <li><b>2.1</b> Can you rely on our Sumsub verification — applicant reuse / share token — or must users pass KYC with your provider? Whose Sumsub instance would it run on?</li>
-          <li><b>2.2</b> Exactly what must be transmitted to you — raw documents + check results, or an attestation + reference?</li>
-          <li><b>2.3</b> What KYC tiers exist, and which fund / buy / withdraw limits attach to each?</li>
-          <li><b>2.4</b> Webhooks on status change (approved / rejected / re-check required)?</li>
+          <li><b>2.1</b> Confirm the model: our Sumsub account; after the user completes the flow we trigger applicant sharing via Sumsub token sharing so you can access the applicant. We need to define the API surface for triggering the share and passing the reference.</li>
+          <li><b>2.2</b> After the share: you run your own compliance checks on the applicant — does anything else need to travel outside Sumsub?</li>
+          <li><b>2.3</b> Our understanding: a single tier today — liveness (selfie) + document + proof of income. Please confirm, and tell us which fund / buy / withdraw limits attach.</li>
+          <li><b>2.4</b> We need a status webhook <i>from you</i>: as the donor platform we get no Sumsub event when the recipient platform's compliance checks pass. How do we learn the account is activated (approved / rejected / re-check)?</li>
           <li><b>2.5</b> KYC expiry &amp; re-verification — cadence, triggers, and what freezes while pending?</li>
           <li><b>2.6</b> Rejections and edge cases (PEP hit, name mismatch) — whose support owns the user?</li>
         </ol>
@@ -227,17 +230,17 @@
     <div class="step" data-step="3">
       <button class="step-head"><span class="num">3</span><div><h3>Fund the cash account</h3><p class="tag">Bank transfer in, balance visible in-app</p></div><span class="chev">›</span></button>
       <div class="step-body">
-        <p class="desc">The user wires euros to their cash account and <b>sees the balance appear inside our app</b> — ideally with a push notification the moment funds credit. That requires a webhook from you on credit. We also need clarity on rails: is it SEPA-only at launch, or are card / Apple Pay realistic?</p>
+        <p class="desc">The user wires euros to their cash account and <b>sees the balance appear inside our app</b> — ideally with a push notification the moment funds credit. That requires a webhook from you on credit. Rails are settled: <b>SEPA only at launch</b> — the open items are the credit webhook and the operational details of the wire.</p>
         <div class="chips"></div>
         <h4>What we assume</h4>
         <ul class="assume">
-          <li>SEPA / SEPA Instant at launch; we render the transfer details and a copy-paste reference.</li>
+          <li>SEPA only at launch (confirmed with Hercle); we render the transfer details and a copy-paste reference.</li>
           <li>You notify us on credit; we own the "money arrived" moment (balance + push).</li>
           <li>Sender account must be in the user's own name.</li>
         </ul>
         <h4 class="hq">For Hercle</h4>
         <ol class="qs">
-          <li><b>3.1</b> Rails at launch: SEPA / SEPA Instant confirmed? Card, Apple Pay / Google Pay on the roadmap? Fees per rail?</li>
+          <li class="done"><b>3.1</b> RESOLVED — SEPA only at launch (settled in prior discussions). Remaining: SEPA fees, and whether SEPA Instant / cards sit anywhere on the roadmap.</li>
           <li><b>3.2</b> Dedicated virtual IBAN per user, or a shared account + reference code?</li>
           <li><b>3.3</b> What does the user's bank see as beneficiary, and what must they get exactly right on the wire?</li>
           <li><b>3.4</b> Webhook when funds credit, so the balance updates in-app in near-real-time? Typical timing SEPA vs Instant?</li>
@@ -261,12 +264,12 @@
         </ul>
         <h4 class="hq">For Hercle</h4>
         <ol class="qs">
-          <li><b>4.1</b> Execution model: RFQ with a locked quote, or market order into your book? Quote validity window? Partial fills possible?</li>
+          <li class="done"><b>4.1</b> PROPOSAL — we use your RFQ with a locked quote; validity window is an API param (15 s default). Confirm, and confirm partial fills can't happen on RFQ.</li>
           <li><b>4.2</b> Fee structure on buys — your fee/spread, and can our fee be layered into the same quote?</li>
           <li><b>4.3</b> Registering an address: what exactly do you need — a signed message per address, in what format? Does our signature satisfy verification alone, or do you run a second method (analytics)? Anything user-visible?</li>
           <li><b>4.4</b> Can we pre-register batches of future addresses? Caps, rate limits, expiry on unused ones? Is registration synchronous — can a buy proceed while it's pending, or is it a hard gate?</li>
-          <li><b>4.5</b> Hardware wallets: Jade requires on-device approval per signature. Can we register a small batch at link time, or is there an alternative attestation path for hardware wallets?</li>
-          <li><b>4.6</b> Settlement: how soon after execution is the withdrawal broadcast? Who pays the network fee? Do you batch withdrawals?</li>
+          <li><b>4.5</b> (ours to solve, not Hercle's) Hardware wallets: Jade requires on-device approval per signature. Our design call: batch-register at link time vs. an alternative attestation path. Kept here for completeness.</li>
+          <li class="done"><b>4.6</b> PARTLY ANSWERED — network fees are constant per network (you keep a fee table) and the user pays them from their BTC balance. Asks: share the fee table, confirm the user pays the withdrawal fee in BTC, and how soon after execution the withdrawal broadcasts / whether you batch.</li>
           <li><b>4.7</b> The €1,000 threshold — applied per transfer or aggregated? Do you verify all self-hosted withdrawals regardless of amount as internal policy?</li>
           <li><b>4.8</b> Can a registration be rejected (analytics flag)? Once verified, is an address whitelisted permanently (EBA GL 86) — or does KYC re-verification invalidate it?</li>
         </ol>
@@ -274,7 +277,7 @@
     </div>
 
     <div class="step" data-step="5">
-      <button class="step-head"><span class="num">5</span><div><h3>Sell — self-custody back to cash</h3><p class="tag">Crypto moves to you; your AML screens it</p></div><span class="chev">›</span></button>
+      <button class="step-head"><span class="num">5</span><div><h3>Sell — self-custody back to cash<span class="later">LATER RELEASE</span></h3><p class="tag">Crypto moves to you; your AML screens it</p></div><span class="chev">›</span></button>
       <div class="step-body">
         <p class="desc">The reverse trip: the user sends bitcoin from their wallet to you, you screen it (chain analytics, travel rule on incoming), and the proceeds land in the cash balance. The open design question is <b>price risk</b>: can the price lock at initiation, or is it sold at market only after confirmations + screening?</p>
         <div class="chips"></div>
@@ -287,16 +290,15 @@
         <h4 class="hq">For Hercle</h4>
         <ol class="qs">
           <li><b>5.1</b> Deposit address for sells: static per user, rotating, or per transaction?</li>
-          <li><b>5.2</b> As the originating (self-hosted) wallet — what travel-rule data must we attach to the transfer? Is a linked wallet pre-cleared, or screened fresh each time?</li>
+          <li><b>5.2</b> As the originating (self-hosted) wallet — what travel-rule data must we attach to the transfer? Does a wallet already linked for buys count as pre-cleared for sells, or is every incoming transfer screened fresh?</li>
           <li><b>5.3</b> Confirmations required before credit, typical screening/hold time, and what happens when a transfer is flagged — user comms, whose support?</li>
           <li><b>5.4</b> Price protection: lock a quote at initiation, or market-sell after the deposit credits? If locked — for how long, and what if confirmations run late?</li>
-          <li><b>5.5</b> Can users sell from any wallet, or only from linked wallets?</li>
         </ol>
       </div>
     </div>
 
     <div class="step" data-step="6">
-      <button class="step-head"><span class="num">6</span><div><h3>Withdraw to bank</h3><p class="tag">Cash balance out — the off-ramp</p></div><span class="chev">›</span></button>
+      <button class="step-head"><span class="num">6</span><div><h3>Withdraw to bank<span class="later">LATER RELEASE</span></h3><p class="tag">Cash balance out — the off-ramp</p></div><span class="chev">›</span></button>
       <div class="step-body">
         <p class="desc">The user moves euros from the cash balance to their bank account. Simple on the surface — the questions are about <b>destination rules</b> (name match, verification, first-time destinations) and whether anything faster than plain SEPA exists.</p>
         <div class="chips"></div>
@@ -318,7 +320,7 @@
     <div class="step" data-step="7">
       <button class="step-head"><span class="num">7</span><div><h3>Where the user ends up</h3><p class="tag">The loop, closed — and the question list in one place</p></div><span class="chev">›</span></button>
       <div class="step-body">
-        <p class="desc">One app: self-custody bitcoin plus a cash balance that funds cheap buys delivered straight to the user's own keys. Nothing custodial lingers. The full question list lives in each step — the ones that <b>block us from committing a flow</b> are: <b>2.1</b> (Sumsub reliance), <b>4.3–4.5</b> (address registration mechanics), <b>3.4</b> (credit webhook), and <b>5.4</b> (sell price model).</p>
+        <p class="desc">One app: self-custody bitcoin plus a cash balance that funds cheap buys delivered straight to the user's own keys. Nothing custodial lingers. The full question list lives in each step — First release scope: <b>through step 4</b> — buy and settle to self-custody; sell and withdraw come later. The v1-blocking questions are <b>2.1/2.2</b> (Sumsub token-sharing API surface), <b>2.4</b> (activation webhook), <b>3.4</b> (credit webhook), and <b>4.3–4.4</b> (address registration mechanics).</p>
         <div class="chips"></div>
       </div>
     </div>
@@ -365,6 +367,7 @@
           <div class="card"><div class="row"><span class="k">💶&nbsp; Hold euros</span><span class="v">in-app balance</span></div>
             <div class="row"><span class="k">₿&nbsp; Buy at lower fees</span><span class="v">to your own wallet</span></div>
             <div class="row"><span class="k">🏦&nbsp; Withdraw</span><span class="v">to your bank</span></div></div>
+          <div class="card" style="padding:10px 14px"><div class="sub">Available in [launch countries] — more coming soon. <span style="color:var(--amber)">Q1.4: which jurisdictions at launch?</span></div></div>
           <div class="card unc"><span class="qtag">Q1.3</span>
             <div class="checkrow"><span class="checkbox c"></span><span>I agree to the <b>Hercle Terms of Service</b> and Privacy Policy. The cash account is provided by Hercle, a regulated virtual asset service provider.</span></div>
             <div class="qnote">Can we present your terms in-app, or do you require your own surface for acceptance?</div>
@@ -416,7 +419,7 @@
           <div class="card unc"><span class="qtag">Q2.1 · Q2.2</span>
             <div style="font-size:12px;font-weight:600;margin-bottom:3px">Verification by Sumsub — shared with Hercle</div>
             <div class="sub">We run KYC through Sumsub and pass the result to Hercle to activate your cash account.</div>
-            <div class="qnote">The critical question: can you rely on our Sumsub applicant (reuse / share token) so the user verifies once — and what exactly must reach you?</div>
+            <div class="qnote">Model: our Sumsub account; on completion we trigger applicant sharing (Sumsub token sharing) so Hercle runs its compliance checks. API surface to define — Q2.1/2.2.</div>
           </div>
           <button class="btnp" data-adv>Start verification</button>
         </div>
@@ -445,10 +448,10 @@
             <div class="row"><span class="k">Fund up to</span><span class="v">€ ______ / mo</span></div>
             <div class="row"><span class="k">Buy up to</span><span class="v">€ ______ / mo</span></div>
             <div class="row"><span class="k">Withdraw up to</span><span class="v">€ ______ / mo</span></div>
-            <div class="qnote">Which limits attach to which KYC tier? We want to show real numbers here, not surprises later.</div>
+            <div class="qnote">Single tier today (liveness + document + proof of income) — confirm, and give us the numbers to show here (Q2.3).</div>
           </div>
           <div class="card unc" style="padding:10px 14px"><span class="qtag">Q2.4 · Q2.5</span>
-            <div class="sub">Status arrives by webhook (incl. pending / re-check states)? And when KYC expires — what freezes?</div>
+            <div class="sub">We need Hercle's webhook for “compliance checks passed / account active” — Sumsub won't tell us, as the donor platform (Q2.4). Plus expiry: what freezes?</div>
           </div>
           <button class="btnp" data-nav="3:0">Add funds</button>
         </div>
@@ -466,10 +469,10 @@
           </div>
           <h4 style="font-size:10.5px;text-transform:uppercase;letter-spacing:.8px;color:var(--dim2);margin:12px 0 8px">Funding methods</h4>
           <div class="card"><div class="row"><span class="k">🏦&nbsp; Bank transfer (SEPA)</span><span class="v"><span class="pill g">launch</span></span></div></div>
-          <div class="card unc"><span class="qtag">Q3.1</span>
-            <div class="row"><span class="k">💳&nbsp; Card payment</span><span class="v"><span class="pill a">possible?</span></span></div>
-            <div class="row"><span class="k">&nbsp;&nbsp;&nbsp; Apple Pay / Google Pay</span><span class="v"><span class="pill a">possible?</span></span></div>
-            <div class="qnote">Which rails can you actually offer, when — and at what fee per rail?</div>
+          <div class="card">
+            <div class="row"><span class="k">💳&nbsp; Card payment</span><span class="v"><span class="pill n">not at launch</span></span></div>
+            <div class="row"><span class="k">&nbsp;&nbsp;&nbsp; Apple Pay / Google Pay</span><span class="v"><span class="pill n">not at launch</span></span></div>
+            <div class="sub" style="margin-top:6px">SEPA-only at launch — confirmed with Hercle.</div>
           </div>
         </div>
       </div>
@@ -521,8 +524,8 @@
             <div class="row"><span class="k">You receive</span><span class="v">≈ 0.00546 BTC</span></div>
             <div class="row"><span class="k">Rate</span><span class="v">€91,150 / BTC</span></div>
             <div class="row"><span class="k">Fees</span><span class="v">€ __ ?</span></div>
-            <div class="row"><span class="k">Quote valid for</span><span class="v">__ s ?</span></div>
-            <div class="qnote">RFQ with a locked quote, or market order into your book? And whose fees show where?</div>
+            <div class="row"><span class="k">Quote valid for</span><span class="v">15 s · locked (RFQ)</span></div>
+            <div class="qnote">Proposal: your RFQ with locked quote, 15 s validity (API param). Remaining: fee structure — whose fees show where (Q4.2).</div>
           </div>
           <div class="card"><div class="row"><span class="k">Deliver to</span><span class="v">Main Wallet · self-custody</span></div></div>
           <button class="btnp" data-adv>Review</button>
@@ -539,7 +542,7 @@
           </div>
           <div class="card unc"><span class="qtag">Q4.5</span><span class="pill a">Jade hardware wallet</span>
             <div class="sub" style="margin-top:6px">Each signature needs approval on the Jade screen. Approving on-device for <i>every</i> buy kills the experience.</div>
-            <div class="qnote">Could we register a batch of addresses at link time — or is there an alternative attestation path for hardware wallets?</div>
+            <div class="qnote">Our problem to solve (not a Hercle question): batch-register at link time, or an alternative attestation path for hardware wallets.</div>
           </div>
           <button class="btnp" data-adv>Link wallet &amp; continue</button>
         </div>
@@ -577,8 +580,8 @@
           </div>
           <div class="card unc"><span class="qtag">Q4.6</span>
             <div class="row"><span class="k">Withdrawal broadcast</span><span class="v">when? ⏱</span></div>
-            <div class="row"><span class="k">Network fee</span><span class="v">paid by ___ ?</span></div>
-            <div class="qnote">How soon after execution does the on-chain withdrawal go out — and do you batch?</div>
+            <div class="row"><span class="k">Network fee</span><span class="v">user pays · from BTC</span></div>
+            <div class="qnote">Constant per-network fees from Hercle's table — asking them to share it and confirm the user pays in BTC. Still open: broadcast timing, batching.</div>
           </div>
           <button class="btnp" data-nav="5:0">Later: sell some back →</button>
         </div>
