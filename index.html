@@ -161,7 +161,7 @@
 </header>
 <main>
   <div id="left">
-    <p class="intro-note">Low-fidelity on purpose. <b>the Blockstream app is a self-custody wallet</b>; Hercle is the regulated VASP behind the cash account. Everything solid is what we intend to build; everything <b style="color:var(--amber)">dashed amber</b> is a question we need answered before we can commit the flow. Click a step to walk its screens. <b style="color:var(--green)">First release scope: steps 0–4</b> — buy &amp; settle to self-custody. Sell and withdraw are shown for the full picture but target a later release.</p>
+    <p class="intro-note">Low-fidelity on purpose. <b>the Blockstream app is a self-custody wallet</b>; Hercle is the regulated VASP behind the cash account. Everything solid is what we intend to build; everything <b style="color:var(--amber)">dashed amber</b> is a question we need answered before we can commit the flow. Click a step to walk its screens. <b style="color:var(--green)">First release scope: steps 0–4 plus withdraw</b> — if users can deposit cash they must be able to withdraw it without buying. Only sell targets a later release.</p>
     <div class="step" data-step="0">
       <button class="step-head"><span class="num">0</span><div><h3>The shape of the integration</h3><p class="tag">Who does what — before we talk screens</p></div><span class="chev">›</span></button>
       <div class="step-body">
@@ -195,11 +195,12 @@
         </ul>
         <h4 class="hq">For Hercle</h4>
         <ol class="qs">
-          <li><b>1.1</b> What's required to open an account, and when — at creation, or can name / DOB / address / phone / tax ID wait for KYC?</li>
-          <li><b>1.2</b> Is the account created silently via API, or does the user get a direct relationship — credentials, transactional emails? Who sends what?</li>
+          <li class="done"><b>1.1</b> OUR INTENDED MODEL (pending Dom's sign-off) — creation with email + country only; name / DOB / address arrive via KYC, not at creation. Tell us if you can support exactly this, and what (if anything) you'd still need up front.</li>
+          <li class="done"><b>1.2</b> OUR INTENDED MODEL (pending Dom's sign-off) — silent creation via API; no Hercle credentials, no Hercle-sent emails; all comms through our app. Can you make that happen — and if not, where exactly does it break?</li>
           <li><b>1.3</b> Which agreements must the user accept, and can we present them in-app on your behalf?</li>
           <li><b>1.4</b> Supported countries: we don't want to geolocate everyone just to gate the entry point. Our proposal: onboarding simply states who can access (“available in … — more countries coming soon”). Which jurisdictions are live at launch?</li>
           <li><b>1.5</b> Can an account sit unverified or unfunded indefinitely — any dormancy / expiry rules?</li>
+          <li><b>1.6</b> Account deletion: we must offer a “delete account” action. We can delete our profile and the Sumsub applicant — how does deleting user data work on your side, and what must you retain as a VASP (and for how long)?</li>
         </ol>
       </div>
     </div>
@@ -217,7 +218,7 @@
         </ul>
         <h4 class="hq">For Hercle</h4>
         <ol class="qs">
-          <li><b>2.1</b> Confirm the model: our Sumsub account; after the user completes the flow we trigger applicant sharing via Sumsub token sharing so you can access the applicant. We need to define the API surface for triggering the share and passing the reference.</li>
+          <li><b>2.1</b> Confirm the model — this is Sumsub-native end to end: our Sumsub account runs the check, then the applicant is linked to your Sumsub account via token sharing. The only thing to define is the small API surface for triggering the share and passing the reference.</li>
           <li><b>2.2</b> After the share: you run your own compliance checks on the applicant — does anything else need to travel outside Sumsub?</li>
           <li><b>2.3</b> Our understanding: a single tier today — liveness (selfie) + document + proof of income. Please confirm, and tell us which fund / buy / withdraw limits attach.</li>
           <li><b>2.4</b> We need a status webhook <i>from you</i>: as the donor platform we get no Sumsub event when the recipient platform's compliance checks pass. How do we learn the account is activated (approved / rejected / re-check)?</li>
@@ -246,6 +247,7 @@
           <li><b>3.4</b> Webhook when funds credit, so the balance updates in-app in near-real-time? Typical timing SEPA vs Instant?</li>
           <li><b>3.5</b> Must the sender name match the KYC name? What's the return path for third-party or mismatched deposits?</li>
           <li><b>3.6</b> Min / max amounts, extra checks on a first deposit?</li>
+          <li><b>3.7</b> Beyond EUR/SEPA: is USD via ACH on your roadmap? If so let's flag the ACH-vs-SEPA timing and reversal differences now, so fund/withdraw states are designed to survive both.</li>
         </ol>
       </div>
     </div>
@@ -298,9 +300,9 @@
     </div>
 
     <div class="step" data-step="6">
-      <button class="step-head"><span class="num">6</span><div><h3>Withdraw to bank<span class="later">LATER RELEASE</span></h3><p class="tag">Cash balance out — the off-ramp</p></div><span class="chev">›</span></button>
+      <button class="step-head"><span class="num">6</span><div><h3>Withdraw to bank<span class="later" style="background:var(--green-soft);color:var(--green)">IN V1</span></h3><p class="tag">Cash balance out — the off-ramp</p></div><span class="chev">›</span></button>
       <div class="step-body">
-        <p class="desc">The user moves euros from the cash balance to their bank account. Simple on the surface — the questions are about <b>destination rules</b> (name match, verification, first-time destinations) and whether anything faster than plain SEPA exists.</p>
+        <p class="desc">The user moves euros from the cash balance to their bank account. Simple on the surface — the questions are about <b>destination rules</b> (name match, verification, first-time destinations) and whether anything faster than plain SEPA exists. <b>In scope for v1:</b> a user who deposits and never buys must be able to get their money back.</p>
         <div class="chips"></div>
         <h4>What we assume</h4>
         <ul class="assume">
@@ -320,7 +322,7 @@
     <div class="step" data-step="7">
       <button class="step-head"><span class="num">7</span><div><h3>Where the user ends up</h3><p class="tag">The loop, closed — and the question list in one place</p></div><span class="chev">›</span></button>
       <div class="step-body">
-        <p class="desc">One app: self-custody bitcoin plus a cash balance that funds cheap buys delivered straight to the user's own keys. Nothing custodial lingers. The full question list lives in each step — First release scope: <b>through step 4</b> — buy and settle to self-custody; sell and withdraw come later. The v1-blocking questions are <b>2.1/2.2</b> (Sumsub token-sharing API surface), <b>2.4</b> (activation webhook), <b>3.4</b> (credit webhook), and <b>4.3–4.4</b> (address registration mechanics).</p>
+        <p class="desc">One app: self-custody bitcoin plus a cash balance that funds cheap buys delivered straight to the user's own keys. Nothing custodial lingers. The full question list lives in each step — First release scope: <b>steps 0–4 plus withdraw</b> — deposited cash must always have an exit; only sell comes later. The v1-blocking questions are <b>2.1/2.2</b> (Sumsub token-sharing API surface), <b>2.4</b> (activation webhook), <b>3.4</b> (credit webhook), and <b>4.3–4.4</b> (address registration mechanics).</p>
         <div class="chips"></div>
       </div>
     </div>
