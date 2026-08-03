@@ -161,7 +161,7 @@
 </header>
 <main>
   <div id="left">
-    <p class="intro-note">Low-fidelity on purpose. <b>the Blockstream app is a self-custody wallet</b>; Hercle is the regulated VASP behind the cash account. Everything solid is what we intend to build; everything <b style="color:var(--amber)">dashed amber</b> is a question we need answered before we can commit the flow. Click a step to walk its screens. <b style="color:var(--green)">First release scope: steps 0–4 plus withdraw</b> — if users can deposit cash they must be able to withdraw it without buying. Only sell targets a later release.</p>
+    <p class="intro-note">Low-fidelity on purpose. <b>the Blockstream app is a self-custody wallet</b>; Hercle is the regulated VASP behind the cash account. Everything solid is what we intend to build; everything <b style="color:var(--amber)">dashed amber</b> is a question we need answered before we can commit the flow. Click a step to walk its screens. <b style="color:var(--green)">Everything here is first-release scope</b> — create, verify, fund, buy to self-custody, withdraw. Sell is parked outside this artefact for now.</p>
     <div class="step" data-step="0">
       <button class="step-head"><span class="num">0</span><div><h3>The shape of the integration</h3><p class="tag">Who does what — before we talk screens</p></div><span class="chev">›</span></button>
       <div class="step-body">
@@ -278,29 +278,8 @@
       </div>
     </div>
 
-    <div class="step" data-step="5">
-      <button class="step-head"><span class="num">5</span><div><h3>Sell — self-custody back to cash<span class="later">LATER RELEASE</span></h3><p class="tag">Crypto moves to you; your AML screens it</p></div><span class="chev">›</span></button>
-      <div class="step-body">
-        <p class="desc">The reverse trip: the user sends bitcoin from their wallet to you, you screen it (chain analytics, travel rule on incoming), and the proceeds land in the cash balance. The open design question is <b>price risk</b>: can the price lock at initiation, or is it sold at market only after confirmations + screening?</p>
-        <div class="chips"></div>
-        <h4>What we assume</h4>
-        <ul class="assume">
-          <li>The app builds and sends the deposit transaction itself — no copy-pasting addresses.</li>
-          <li>A sell from an already-linked wallet should be low-friction: you already know these addresses are the user's.</li>
-          <li>Screening happens on your side; we surface honest states (sent → screening → credited), never a silent hold.</li>
-        </ul>
-        <h4 class="hq">For Hercle</h4>
-        <ol class="qs">
-          <li><b>5.1</b> Deposit address for sells: static per user, rotating, or per transaction?</li>
-          <li><b>5.2</b> As the originating (self-hosted) wallet — what travel-rule data must we attach to the transfer? Does a wallet already linked for buys count as pre-cleared for sells, or is every incoming transfer screened fresh?</li>
-          <li><b>5.3</b> Confirmations required before credit, typical screening/hold time, and what happens when a transfer is flagged — user comms, whose support?</li>
-          <li><b>5.4</b> Price protection: lock a quote at initiation, or market-sell after the deposit credits? If locked — for how long, and what if confirmations run late?</li>
-        </ol>
-      </div>
-    </div>
-
     <div class="step" data-step="6">
-      <button class="step-head"><span class="num">6</span><div><h3>Withdraw to bank<span class="later" style="background:var(--green-soft);color:var(--green)">IN V1</span></h3><p class="tag">Cash balance out — the off-ramp</p></div><span class="chev">›</span></button>
+      <button class="step-head"><span class="num">5</span><div><h3>Withdraw to bank</h3><p class="tag">Cash balance out — the off-ramp</p></div><span class="chev">›</span></button>
       <div class="step-body">
         <p class="desc">The user moves euros from the cash balance to their bank account. Simple on the surface — the questions are about <b>destination rules</b> (name match, verification, first-time destinations) and whether anything faster than plain SEPA exists. <b>In scope for v1:</b> a user who deposits and never buys must be able to get their money back.</p>
         <div class="chips"></div>
@@ -311,22 +290,15 @@
         </ul>
         <h4 class="hq">For Hercle</h4>
         <ol class="qs">
-          <li><b>6.1</b> Payout rails: SEPA only? SEPA Instant? Payout to card?</li>
-          <li><b>6.2</b> Destination rules: must the holder name match the KYC name? Do you verify the account (micro-deposit)? Withdrawals only to accounts previously used for funding?</li>
-          <li><b>6.3</b> Fees, limits and timing per rail — and a webhook on completion?</li>
-          <li><b>6.4</b> Large withdrawals: thresholds for extra checks (source of funds)?</li>
+          <li><b>5.1</b> Payout rails: SEPA only? SEPA Instant? Payout to card?</li>
+          <li><b>5.2</b> Destination rules: must the holder name match the KYC name? Do you verify the account (micro-deposit)? Withdrawals only to accounts previously used for funding?</li>
+          <li><b>5.3</b> Fees, limits and timing per rail — and a webhook on completion?</li>
+          <li><b>5.4</b> Large withdrawals: thresholds for extra checks (source of funds)?</li>
         </ol>
       </div>
     </div>
 
-    <div class="step" data-step="7">
-      <button class="step-head"><span class="num">7</span><div><h3>Where the user ends up</h3><p class="tag">The loop, closed — and the question list in one place</p></div><span class="chev">›</span></button>
-      <div class="step-body">
-        <p class="desc">One app: self-custody bitcoin plus a cash balance that funds cheap buys delivered straight to the user's own keys. Nothing custodial lingers. The full question list lives in each step — First release scope: <b>steps 0–4 plus withdraw</b> — deposited cash must always have an exit; only sell comes later. The v1-blocking questions are <b>2.1/2.2</b> (Sumsub token-sharing API surface), <b>2.4</b> (activation webhook), <b>3.4</b> (credit webhook), and <b>4.3–4.4</b> (address registration mechanics).</p>
-        <div class="chips"></div>
       </div>
-    </div>
-  </div>
   <div id="right">
     <div id="phone">
       <div class="notch"></div>
@@ -585,59 +557,7 @@
             <div class="row"><span class="k">Network fee</span><span class="v">user pays · from BTC</span></div>
             <div class="qnote">Constant per-network fees from Hercle's table — asking them to share it and confirm the user pays in BTC. Still open: broadcast timing, batching.</div>
           </div>
-          <button class="btnp" data-nav="5:0">Later: sell some back →</button>
-        </div>
-      </div>
-
-      <!-- STEP 5 -->
-      <div class="screen" data-step="5" data-name="Sell — price locked, or market later?">
-        <div class="statusbar"><span>9:41</span><span>▪▪▪ ⌁ ▮</span></div>
-        <div class="apphead"><span class="back">‹</span>Sell Bitcoin</div>
-        <div class="appbody">
-          <div class="card center" style="padding:20px 14px">
-            <div class="lbl">You sell · from Main Wallet</div>
-            <div class="big" style="font-size:34px">0.005 BTC</div>
-          </div>
-          <div class="card unc"><span class="qtag">Q5.4</span>
-            <div class="row"><span class="k">You receive</span><span class="v">≈ €455.00</span></div>
-            <div class="row"><span class="k">Price</span><span class="v">locked now? ⏱</span></div>
-            <div class="qnote">Can the price lock at initiation — or is it market-sold only after the deposit confirms and clears screening? Big UX difference.</div>
-          </div>
-          <button class="btnp" data-adv>Continue</button>
-        </div>
-      </div>
-      <div class="screen" data-step="5" data-name="Send to Hercle — what travels with it?">
-        <div class="statusbar"><span>9:41</span><span>▪▪▪ ⌁ ▮</span></div>
-        <div class="apphead"><span class="back">‹</span>Send to cash account</div>
-        <div class="appbody">
-          <p class="lp">The app sends the bitcoin for you — no copy-pasting addresses.</p>
-          <div class="card unc"><span class="qtag">Q5.1</span>
-            <div class="lbl">Hercle deposit address</div>
-            <div style="font-size:12px;font-weight:600">bc1p x2m9 ···· ···· 7dqe</div>
-            <div class="qnote">Static per user, rotating, or per transaction?</div>
-          </div>
-          <div class="card unc"><span class="qtag">Q5.2</span>
-            <div class="sub">This transfer originates from a self-hosted wallet — one you already know is the user's (it's linked). What travel-rule data must we attach, and is a linked wallet pre-cleared?</div>
-          </div>
-          <button class="btnp" data-adv>Send 0.005 BTC</button>
-        </div>
-      </div>
-      <div class="screen" data-step="5" data-name="Screening → credited — honest states">
-        <div class="statusbar"><span>9:41</span><span>▪▪▪ ⌁ ▮</span></div>
-        <div class="apphead"><span class="back">‹</span>Sell · in progress</div>
-        <div class="appbody">
-          <div class="timeline" style="padding:4px 6px">
-            <div class="tl"><span class="dot"></span><div class="t">Sent from Main Wallet <small>0.005 BTC</small></div></div>
-            <div class="tl warn"><span class="dot"></span><div class="t">Confirming &amp; screening <small>Hercle AML / chain analytics</small></div></div>
-            <div class="tl pend"><span class="dot"></span><div class="t">Credited to cash balance <small>≈ €455.00</small></div></div>
-          </div>
-          <div class="card unc"><span class="qtag">Q5.3</span>
-            <div class="row"><span class="k">Confirmations needed</span><span class="v">__ ?</span></div>
-            <div class="row"><span class="k">Typical hold</span><span class="v">__ min ?</span></div>
-            <div class="row"><span class="k">If flagged</span><span class="v">then what?</span></div>
-            <div class="qnote">We'll show honest states either way — but we need to know what the states are, and whose support the user calls.</div>
-          </div>
-          <button class="btnp" data-nav="6:0">Credited → withdraw</button>
+          <button class="btnp" data-nav="6:0">Next: withdraw to bank →</button>
         </div>
       </div>
 
@@ -650,7 +570,7 @@
             <div class="lbl">From cash balance · €455.00 available</div>
             <div class="big" style="font-size:34px">€455</div>
           </div>
-          <div class="card unc"><span class="qtag">Q6.1</span>
+          <div class="card unc"><span class="qtag">Q5.1</span>
             <div class="row"><span class="k">🏦&nbsp; SEPA transfer</span><span class="v"><span class="pill g">assumed</span></span></div>
             <div class="row"><span class="k">⚡&nbsp; SEPA Instant</span><span class="v"><span class="pill a">?</span></span></div>
             <div class="row"><span class="k">💳&nbsp; To card</span><span class="v"><span class="pill a">?</span></span></div>
@@ -663,8 +583,8 @@
         <div class="apphead"><span class="back">‹</span>Add bank account</div>
         <div class="appbody">
           <div class="input"><div class="flt">IBAN</div>BG80 BNBG 9661 ···· ···· 41</div>
-          <div class="input unc" style="position:relative"><span class="qtag">Q6.2</span><div class="flt">Account holder</div>Satoshi Nakamoto</div>
-          <div class="card unc" style="padding:10px 14px"><span class="qtag">Q6.2</span>
+          <div class="input unc" style="position:relative"><span class="qtag">Q5.2</span><div class="flt">Account holder</div>Satoshi Nakamoto</div>
+          <div class="card unc" style="padding:10px 14px"><span class="qtag">Q5.2</span>
             <div class="sub">Must this match the verified name exactly? Do you verify the account (micro-deposit)? Or: withdrawals only to accounts previously used for funding?</div>
           </div>
           <button class="btnp" data-adv>Withdraw €455.00</button>
@@ -676,44 +596,15 @@
           <div class="okball">✓</div>
           <div class="h2">Withdrawal on its way</div>
           <p class="p">€455.00 → BG80 ···· 41</p>
-          <div class="card unc"><span class="qtag">Q6.3</span>
+          <div class="card unc"><span class="qtag">Q5.3</span>
             <div class="row"><span class="k">Fee</span><span class="v">€ __ ?</span></div>
             <div class="row"><span class="k">Arrives</span><span class="v">__ business days ?</span></div>
             <div class="row"><span class="k">Completion webhook</span><span class="v">so we can confirm ✓?</span></div>
           </div>
-          <button class="btnp" data-nav="7:0">See the full loop</button>
+          <button class="btnp" data-nav="0:0">Back to overview</button>
         </div>
       </div>
 
-      <!-- STEP 7 -->
-      <div class="screen" data-step="7" data-name="The loop, closed">
-        <div class="statusbar"><span>9:41</span><span>▪▪▪ ⌁ ▮</span></div>
-        <div class="apphead">Home<span class="gear">⚙</span></div>
-        <div class="appbody">
-          <div class="card hero">
-            <div class="lbl">Main Wallet · self-custody</div>
-            <div class="big">0.4218 BTC</div>
-            <div class="sub">≈ €38,455 · your keys, always</div>
-          </div>
-          <div class="card">
-            <div class="lbl">Cash Account · Hercle</div>
-            <div class="big">€0.00</div>
-            <div class="sub"><span class="pill g">verified</span> &nbsp;fund · buy · sell · withdraw</div>
-          </div>
-          <div class="card">
-            <div class="lbl">Activity</div>
-            <div class="row"><span class="k">↓ Bought 0.00546 BTC</span><span class="v">−€500.00</span></div>
-            <div class="row"><span class="k">↑ Sold 0.005 BTC</span><span class="v">+€455.00</span></div>
-            <div class="row"><span class="k">🏦 Withdrew to bank</span><span class="v">−€455.00</span></div>
-          </div>
-          <div class="bnav">
-            <div class="cur"><div class="ico">⌂</div>Home</div>
-            <div><div class="ico">⇅</div>Buy&nbsp;&amp;&nbsp;Sell</div>
-            <div><div class="ico">◍</div>Assets</div>
-            <div><div class="ico">☰</div>Settings</div>
-          </div>
-        </div>
-      </div>
     </div>
     <div id="caption"></div>
     <div id="controls">
