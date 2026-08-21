@@ -67,6 +67,17 @@
   ol.qs li.done b{color:var(--green)}
   .later{display:inline-block;font-size:9px;font-weight:800;letter-spacing:.5px;padding:2px 7px;border-radius:9px;background:#2a3238;color:var(--dim);margin-left:8px;vertical-align:2px}
 
+  /* progressive disclosure — answered questions collapse out of the way, open ones stay put */
+  .answered-toggle{display:flex;align-items:center;gap:6px;width:100%;font-family:inherit;background:var(--panel2);border:1px dashed var(--line2);color:var(--green);border-radius:8px;padding:7px 10px;font-size:11px;cursor:pointer;text-align:left;margin:4px 0}
+  .answered-toggle:hover{border-color:var(--green)}
+  .answered-toggle .car{margin-left:auto;color:var(--dim2);font-size:12px;transition:transform .15s}
+  .answered-toggle.open .car{transform:rotate(90deg)}
+  .answered-group{list-style:none;display:none}
+  .answered-group.open{display:block}
+  .answered-group li{font-size:12px;color:#a9c8d6;line-height:1.55;padding:6px 8px;margin:4px 0;border-left:3px solid var(--green);background:var(--green-soft);border-radius:0 8px 8px 0}
+  .answered-group li b{color:var(--green);margin-right:4px}
+  .allclear{font-size:11.5px;color:var(--green);padding:6px 8px;opacity:.85;display:block}
+
   /* ---------- RIGHT PANEL ---------- */
   #right{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:20px;background:radial-gradient(1200px 600px at 60% 20%,#0b0e10 0%,var(--bg) 60%)}
   #phone{width:340px;height:696px;background:var(--phone-bg);border-radius:44px;border:2px solid #23292e;box-shadow:0 0 0 9px #0a0c0e,0 30px 80px rgba(0,0,0,.7);position:relative;overflow:hidden;flex:none}
@@ -196,7 +207,7 @@
         <h4 class="hq">For Hercle</h4>
         <ol class="qs">
           <li class="done"><b>1.1</b> HERCLE CONFIRMED — yes, accounts can be created with email + country only; name / DOB / address collected via KYC. Matches our model exactly.</li>
-          <li class="done"><b>1.2</b> HERCLE PARTLY CONFIRMED — silent API creation with no Hercle credentials works, as long as the user doesn't separately log in to Hercle directly. But they can't suppress their own sign-up emails today — would need a white-label notification layer routed through our app. <b>Open internally:</b> Rich to call whether this is a launch blocker or a disclosure we accept (21 Aug, unresolved).</li>
+          <li><b>1.2</b> HERCLE PARTLY CONFIRMED — silent API creation with no Hercle credentials works, as long as the user doesn't separately log in to Hercle directly. But they can't suppress their own sign-up emails today — would need a white-label notification layer routed through our app. <b>Open internally:</b> Rich to call whether this is a launch blocker or a disclosure we accept (21 Aug, unresolved).</li>
           <li class="done"><b>1.3</b> HERCLE CONFIRMED — KYC/KYB agreements are covered via Sumsub. We can present the T&amp;Cs in-app on their behalf as long as the step is mandatory and clearly discloses the user can also log in to Hercle separately.</li>
           <li class="done"><b>1.4</b> HERCLE CONFIRMED — explicit prohibited list (very-high-risk under their Group Customer Acceptance Policy): Afghanistan, Belarus, CAR, China, DRC, Cuba, Ethiopia, Haiti, Iran, Iraq, Lebanon, Libya, Mali, Myanmar, Namibia, Nepal, Nicaragua, North Korea, Palestine (West Bank/Gaza), Russia, Somalia, South Sudan, Sudan, Syria, Venezuela, Vietnam, Yemen, plus Crimea/Donetsk/Luhansk/Zaporizhzhia/Kherson. High-risk countries onboard with enhanced due diligence. No geolocation needed — matches our proposal.</li>
           <li class="done"><b>1.5</b> HERCLE CONFIRMED — no dormancy or expiry rules, an account can sit unverified/unfunded indefinitely.</li>
@@ -265,7 +276,7 @@
         <h4 class="hq">For Hercle</h4>
         <ol class="qs">
           <li class="done"><b>4.1</b> HERCLE CONFIRMED — RFQ with locked quote, 15s default validity, no partial fills on RFQ. Exactly our proposal.</li>
-          <li><b>4.2</b> HERCLE — our signed-message proposal "needs evaluation before we commit"; they currently use email confirmation + a penny test for regulatory reasons and might not be able to rely on ours. They've asked us to share more detail on the method so they can evaluate it. <span style="color:var(--amber)">Open — they'll revert.</span> <b>Our follow-up (urgent, has a real deadline):</b> citing another VASP on the same travel-rule scheme that skips the penny test and requires cryptographic proof instead; Dom to draft the technical spec — not written yet.</li>
+          <li><b>4.2</b> HERCLE — our signed-message proposal "needs evaluation before we commit"; they currently use email confirmation + a penny test for regulatory reasons and might not be able to rely on ours. They've asked us to share more detail on the method so they can evaluate it. <span style="color:var(--amber)">Open — they'll revert.</span> <b>Our follow-up:</b> citing another VASP on the same travel-rule scheme that skips the penny test and requires cryptographic proof instead; Dom to draft the technical spec — not written yet.</li>
           <li class="done"><b>4.3</b> HERCLE CONFIRMED — no batch registration, addresses whitelisted individually. No expiry on unused registrations. Rate limit 500 req/s. You can buy without a pre-whitelisted external address — whitelisting is only a prerequisite for withdrawal, not for buying.</li>
           <li><b>4.4</b> (ours to solve, not Hercle's) Hardware wallets: Jade requires on-device approval per signature. Our design call: batch-register at link time vs. an alternative attestation path. Kept here for completeness.</li>
           <li class="done"><b>4.5</b> HERCLE CONFIRMED — settlement fee paid in BTC. No batching — transactions are subaccount-based, each withdrawal broadcasts as its own transaction, on average ~30 minutes after execution. <span style="color:var(--amber)">New follow-up (21 Aug):</span> does the payout trigger itself require an OTP on their API? Unanswered — directly affects our OTP-placement design if yes.</li>
@@ -611,6 +622,41 @@
   </div>
 </main>
 <script>
+// progressive disclosure: collapse Hercle-confirmed questions out of the way, leave open ones visible
+(function(){
+  document.querySelectorAll('ol.qs').forEach(function(ol){
+    var doneItems = Array.prototype.slice.call(ol.querySelectorAll('li.done'));
+    if(!doneItems.length) return;
+
+    var group = document.createElement('ul');
+    group.className = 'answered-group';
+    var nums = doneItems.map(function(li){
+      var b = li.querySelector('b');
+      return b ? b.textContent.trim() : '';
+    }).filter(Boolean);
+    doneItems.forEach(function(li){ group.appendChild(li); }); // moves them out of ol
+
+    var btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'answered-toggle';
+    var label = '✓ Answered by Hercle — ' + nums.join(', ');
+    btn.innerHTML = '<span class="lbl">' + label + '</span><span class="car">›</span>';
+    btn.addEventListener('click', function(){
+      var isOpen = group.classList.toggle('open');
+      btn.classList.toggle('open', isOpen);
+    });
+
+    ol.parentNode.insertBefore(btn, ol.nextSibling);
+    ol.parentNode.insertBefore(group, btn.nextSibling);
+
+    if(!ol.querySelector('li')){
+      var note = document.createElement('div');
+      note.className = 'allclear';
+      note.textContent = 'Nothing open here — fully confirmed.';
+      ol.parentNode.insertBefore(note, ol);
+    }
+  });
+})();
 (function(){
   var screens = Array.prototype.slice.call(document.querySelectorAll('.screen'));
   var steps = Array.prototype.slice.call(document.querySelectorAll('.step'));
