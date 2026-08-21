@@ -26,7 +26,11 @@
   .qdot{display:inline-flex;align-items:center;justify-content:center;width:15px;height:15px;border-radius:50%;background:var(--amber);color:#1a1200;font-weight:800;font-size:10px}
   .adot{display:inline-block;width:13px;height:13px;border-radius:4px;background:var(--green)}
 
-  main{display:flex;height:calc(100% - 58px)}
+  main{height:calc(100% - 58px)}
+  #detailed{display:none;height:100%}
+  body.mode-detailed #detailed{display:flex}
+  body.mode-detailed #simple{display:none}
+  body.mode-simple #simple{display:block}
 
   /* ---------- LEFT PANEL ---------- */
   #left{width:480px;min-width:400px;overflow-y:auto;padding:18px 18px 60px;border-right:1px solid var(--line)}
@@ -157,9 +161,34 @@
   #dots{display:flex;gap:6px}
   #dots span{width:7px;height:7px;border-radius:50%;background:var(--line2)}
   #dots span.on{background:var(--green)}
+
+  /* ---------- SIMPLE VIEW (default) ---------- */
+  .modebtn{font-family:inherit;background:var(--panel2);border:1px solid var(--line2);color:var(--dim);border-radius:16px;padding:6px 14px;font-size:12px;cursor:pointer;margin-left:8px}
+  .modebtn.on{background:var(--green-soft);border-color:var(--green);color:var(--green)}
+  #simple{display:none;height:calc(100% - 58px);overflow-y:auto}
+  #simple .inner{max-width:760px;margin:0 auto;padding:34px 28px 80px}
+  #simple .lead{font-size:14px;color:var(--dim);line-height:1.6;margin-bottom:30px}
+  .s-section{margin-bottom:36px}
+  .s-section h2{font-size:19px;font-weight:800;display:flex;align-items:center;gap:10px;margin-bottom:4px}
+  .s-section h2 .dot{width:11px;height:11px;border-radius:50%;flex:none}
+  .s-section .s-sub{font-size:12.5px;color:var(--dim2);margin:0 0 14px 21px}
+  .s-item{display:flex;align-items:flex-start;gap:12px;padding:13px 14px;border-radius:12px;margin-bottom:8px;border-left:4px solid var(--line2);background:var(--panel)}
+  .s-item .s-ref{flex:none;font-size:10.5px;font-weight:800;color:var(--dim2);width:88px;line-height:1.4;padding-top:2px}
+  .s-item .s-text{flex:1;font-size:14px;line-height:1.55;color:var(--text)}
+  .s-item .s-jump{flex:none;font-family:inherit;background:none;border:1px solid var(--line2);color:var(--dim);border-radius:14px;padding:5px 11px;font-size:11px;cursor:pointer;align-self:center}
+  .s-item .s-jump:hover{border-color:var(--green);color:var(--green)}
+  .s-section.open .s-item{border-left-color:var(--amber)}
+  .s-section.settled .s-item{border-left-color:var(--green)}
+  .s-section.ask .s-item{border-left-color:var(--green-dk)}
+  .s-section.decision .s-item{border-left-color:var(--dim2)}
+  .s-section.open h2 .dot{background:var(--amber)}
+  .s-section.settled h2 .dot{background:var(--green)}
+  .s-section.ask h2 .dot{background:var(--green-dk)}
+  .s-section.decision h2 .dot{background:var(--dim2)}
+  .s-more{font-size:12px;color:var(--dim2);padding:2px 0 2px 14px}
 </style>
 </head>
-<body>
+<body class="mode-simple">
 <header>
   <div class="brand">
     <div class="logo">B</div>
@@ -169,9 +198,43 @@
     <span class="key"><span class="adot"></span> our working assumption</span>
     <span class="key" style="color:var(--green)">✓ Hercle confirmed</span>
     <span class="key"><span class="qdot">?</span> still open</span>
+    <span style="width:1px;height:20px;background:var(--line);display:inline-block;margin:0 2px"></span>
+    <button class="modebtn" id="btnSimple">Simple</button>
+    <button class="modebtn" id="btnDetailed">Detailed + phone</button>
   </div>
 </header>
 <main>
+  <div id="simple">
+    <div class="inner">
+      <p class="lead">Four piles. Nothing else. Click "detail →" on anything to see it walked through in the full app.</p>
+
+      <div class="s-section open">
+        <h2><span class="dot"></span>Still open — nobody's answered yet</h2>
+        <p class="s-sub">Waiting on Hercle, or on us deciding what we want.</p>
+        <div class="s-list"></div>
+      </div>
+
+      <div class="s-section settled">
+        <h2><span class="dot"></span>Settled — done, nothing more to say</h2>
+        <p class="s-sub">Both sides agree. Locked.</p>
+        <div class="s-list"></div>
+      </div>
+
+      <div class="s-section ask">
+        <h2><span class="dot"></span>Questions we still need to send them</h2>
+        <p class="s-sub">Came out of our internal call — not sent to Hercle yet.</p>
+        <div class="s-list"></div>
+      </div>
+
+      <div class="s-section decision">
+        <h2><span class="dot"></span>Decisions we made ourselves</h2>
+        <p class="s-sub">Nothing to do with Hercle — just us.</p>
+        <div class="s-list"></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="detailed">
   <div id="left">
     <p class="intro-note">Low-fidelity on purpose. <b>the Blockstream app is a self-custody wallet</b>; Hercle is the regulated VASP behind the cash account. Everything solid is what we intend to build; everything <b style="color:var(--amber)">dashed amber</b> is a question we need answered before we can commit the flow. Click a step to walk its screens. <b style="color:var(--green)">Everything here is first-release scope</b> — create, verify, fund, buy to self-custody, withdraw. Sell is parked outside this artefact for now.</p>
     <div class="step" data-step="0">
@@ -620,6 +683,7 @@
       <button id="next">Next ›</button>
     </div>
   </div>
+  </div>
 </main>
 <script>
 // progressive disclosure: collapse Hercle-confirmed questions out of the way, leave open ones visible
@@ -745,6 +809,94 @@
   });
 
   go('0', 0);
+  window.__go = go;
+})();
+</script>
+<script>
+// mode toggle: Simple (default) vs Detailed + phone
+(function(){
+  var body = document.body;
+  var bS = document.getElementById('btnSimple');
+  var bD = document.getElementById('btnDetailed');
+  function setMode(m){
+    body.classList.remove('mode-simple','mode-detailed');
+    body.classList.add('mode-' + m);
+    bS.classList.toggle('on', m === 'simple');
+    bD.classList.toggle('on', m === 'detailed');
+  }
+  bS.addEventListener('click', function(){ setMode('simple'); });
+  bD.addEventListener('click', function(){ setMode('detailed'); });
+  window.gotoDetail = function(step){
+    setMode('detailed');
+    setTimeout(function(){ if(window.__go) window.__go(step, 0); }, 30);
+  };
+  setMode('simple');
+})();
+
+// Simple view — four plain piles, rendered from one data list
+(function(){
+  var ITEMS = [
+    // STILL OPEN
+    {status:'open', ref:'4.2', step:'4', text:"Exactly how our “proof of ownership” works — they asked, we haven't sent it."},
+    {status:'open', ref:'2.3', step:'2', text:"Whether they'll offer a cheaper, lighter ID-check tier."},
+    {status:'open', ref:'3.1', step:'3', text:"The deposit fee amount."},
+    {status:'open', ref:'3.3', step:'3', text:"Exact wire-transfer details."},
+    {status:'open', ref:'3.5', step:'3', text:"What happens if money comes from the wrong bank account."},
+    {status:'open', ref:'1.2', step:'1', text:"Whether we care that they'll email our users directly — we haven't decided."},
+
+    // SETTLED (headline items only — full list lives in Detailed view)
+    {status:'settled', ref:'0.2', step:'0', text:"We trigger the bitcoin payout ourselves, not them."},
+    {status:'settled', ref:'2.1/2.2', step:'2', text:"We don't need our own ID-check system — just reuse the one check."},
+    {status:'settled', ref:'1.1', step:'1', text:"Sign-up with email + country only — works."},
+    {status:'settled', ref:'4.7', step:'4', text:"Their one-time address approval process — accepted."},
+
+    // OUR QUESTIONS TO SEND (not sent yet) — ref shows which original code each one hangs off
+    {status:'ask', ref:'4.8 · NEW', step:'4', text:"Does pulling money out on their end need a security code too?"},
+    {status:'ask', ref:'4.2 · our reply', step:'4', text:"Will they accept a digital signature instead of a penny-test?"},
+    {status:'ask', ref:'2.3 · our push', step:'2', text:"Can the ID-check be lighter for smaller users?"},
+    {status:'ask', ref:'5.2 · our push', step:'6', text:"Can they auto-approve the same bank account for withdrawals that we used for deposits?"},
+
+    // DECISIONS WE MADE (internal — no step link)
+    {status:'decision', ref:'', step:null, text:"The wallet works fine with or without the cash account."},
+    {status:'decision', ref:'', step:null, text:"Sign-up is just email, no password."},
+    {status:'decision', ref:'', step:null, text:"Security code only needed for two things: adding a withdrawal address, and withdrawing money."},
+    {status:'decision', ref:'', step:null, text:"Same crypto address gets reused for every purchase."},
+    {status:'decision', ref:'', step:null, text:"Rich and Nasko are the only two talking to Hercle from now on."}
+  ];
+
+  var SETTLED_TOTAL = 24; // shown count vs actual — see note below
+
+  ['open','settled','ask','decision'].forEach(function(status){
+    var list = document.querySelector('.s-section.' + status + ' .s-list');
+    if(!list) return;
+    ITEMS.filter(function(it){ return it.status === status; }).forEach(function(it){
+      var row = document.createElement('div');
+      row.className = 's-item';
+      var ref = document.createElement('span');
+      ref.className = 's-ref';
+      ref.textContent = it.ref || '';
+      var text = document.createElement('span');
+      text.className = 's-text';
+      text.textContent = it.text;
+      row.appendChild(ref);
+      row.appendChild(text);
+      if(it.step !== null){
+        var jump = document.createElement('button');
+        jump.type = 'button';
+        jump.className = 's-jump';
+        jump.textContent = 'detail →';
+        jump.addEventListener('click', function(){ window.gotoDetail(it.step); });
+        row.appendChild(jump);
+      }
+      list.appendChild(row);
+    });
+    if(status === 'settled'){
+      var more = document.createElement('div');
+      more.className = 's-more';
+      more.textContent = '+ ' + (SETTLED_TOTAL - ITEMS.filter(function(it){return it.status==='settled';}).length) + ' more confirmed answers — see Detailed view for the full list.';
+      list.appendChild(more);
+    }
+  });
 })();
 </script>
 <style>/* ---- comment layer ---- */
