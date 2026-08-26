@@ -187,6 +187,16 @@
   #ledger .ldg-legend2{display:flex;flex-direction:column;gap:7px;margin:4px 0 16px;padding:10px 8px;border-top:1px solid var(--line);font-size:11px;color:var(--dim)}
   #ledger .ldg-legend2 .k{display:flex;align-items:center;gap:6px}
   #ledger .ldg-legend2 .sw{width:8px;height:8px;border-radius:50%;flex:none}
+  #ledger .ldg-filter-lbl{font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--dim2);margin:4px 0 8px;padding:10px 8px 0;border-top:1px solid var(--line)}
+  #ledger .ldg-filters{display:flex;flex-direction:column;gap:5px;padding:0 8px;margin-bottom:16px}
+  .ldg-fbtn{display:flex;align-items:center;gap:7px;font-family:inherit;font-size:11.5px;text-align:left;padding:6px 10px;border-radius:14px;border:1px solid var(--line2);background:var(--panel2);color:var(--dim);cursor:pointer}
+  .ldg-fbtn:hover{border-color:var(--dim2)}
+  .ldg-fbtn.on{background:var(--green-soft);border-color:var(--green);color:var(--green)}
+  .ldg-fbtn .sw{width:8px;height:8px;border-radius:50%;flex:none}
+  body[data-ldgfilter="dec"] .ldg-tr:not([data-status="dec"]){display:none}
+  body[data-ldgfilter="open"] .ldg-tr:not([data-status="open"]){display:none}
+  body[data-ldgfilter="new"] .ldg-tr:not([data-status="new"]){display:none}
+  .ldg-topic.ldg-hidden{display:none}
   .ldg-group{margin-bottom:44px;scroll-margin-top:16px}
   .ldg-group h2{font-size:17px;font-weight:800;margin:0 0 4px}
   .ldg-group .ldg-gsub{font-size:12.5px;color:var(--dim);line-height:1.55;max-width:76ch;margin-bottom:14px}
@@ -241,17 +251,19 @@
           <a href="#lt4"><span class="n">4</span>Buy → self-custody</a>
           <a href="#lt5"><span class="n">5</span>Withdraw to bank</a>
         </nav>
-        <div class="ldg-legend2">
-          <span class="k"><span class="sw" style="background:var(--green)"></span>Decided</span>
-          <span class="k"><span class="sw" style="background:var(--amber)"></span>Outstanding</span>
-          <span class="k"><span class="sw" style="background:#8fb0ff"></span>Not yet sent</span>
+        <div class="ldg-filter-lbl">Show only</div>
+        <div class="ldg-filters" id="ldgFilters">
+          <button class="ldg-fbtn on" data-f="all">All</button>
+          <button class="ldg-fbtn" data-f="dec"><span class="sw" style="background:var(--green)"></span>Decided</button>
+          <button class="ldg-fbtn" data-f="open"><span class="sw" style="background:var(--amber)"></span>Outstanding</button>
+          <button class="ldg-fbtn" data-f="new"><span class="sw" style="background:#8fb0ff"></span>New</button>
         </div>
         <p class="ldg-railnote">“walk this →” opens the topic in the Detailed + phone view.</p>
       </aside>
 
       <div class="ldg-main">
         <p class="ldg-lead">Every question raised with Hercle, in their own numbering and grouped by their original topics — what Blockstream asked, what Hercle answered, and Blockstream’s follow-up. Status is marked per row.</p>
-        <div class="ldg-meta">Last updated 25 Aug · sources: Hercle response document, Blockstream internal reviews 21–25 Aug · 31 entries — 19 decided, 12 outstanding (2 not yet sent)</div>
+        <div class="ldg-meta">Last updated 25 Aug · sources: Hercle response document, Blockstream internal reviews 21–25 Aug · 31 entries — 19 decided, 12 outstanding (2 new)</div>
 
         <section class="ldg-topic" id="lt0">
           <div class="ldg-thead">
@@ -295,7 +307,7 @@
 <tr class="ldg-tr" data-status="open"><td class="ref"><span class="ldg-code">2.3</span><br><span class="ldg-pill open">Open — Hercle to revert</span></td><td class="ask"><p>Is there a single verification tier (liveness, document, proof of income), and which limits attach to it?</p></td><td class="ans"><p>Not a single tier today, we are also requiring a questionnaire, but we're reviewing and updating the current model. We'll confirm the tier structure later. Open — we'll revert.</p></td><td class="fup"><p>Blockstream formally requests a lighter tier — less data collected, lower limits — for lower-risk users (agreed internally 24 Aug).</p></td></tr>
 <tr class="ldg-tr" data-status="dec"><td class="ref"><span class="ldg-code">2.4</span><br><span class="ldg-pill dec">Confirmed in principle</span></td><td class="ask"><p>Can Hercle send a status webhook confirming when an account is activated?</p></td><td class="ans"><p>Yes — we'll send you a webhook when the account is activated (approved / rejected / re-check). We'll define the exact events and payload as part of the API spec.</p></td><td class="fup"><p>Events and payload to be defined in the joint API-spec session.</p></td></tr>
 <tr class="ldg-tr" data-status="dec"><td class="ref"><span class="ldg-code">2.5 / 2.6</span><br><span class="ldg-pill dec">Confirmed</span></td><td class="ask"><p>What's the re-verification cadence, and how are rejections or edge cases (PEP hits, name mismatches) handled?</p></td><td class="ans"><p>Re-verification is risk-based: high risk ~6 months, medium ~1 year, low ~2–3 years; if there's no response within 2 weeks of the due date we disable the account. On rejections / mismatches (e.g. PEP hit, name mismatch), the user reaches out and we review the case to accept or reject.</p></td><td class="fup"><p>—</p></td></tr>
-<tr class="ldg-tr" data-status="new"><td class="ref"><span class="ldg-code">2.7</span><br><span class="ldg-pill new">New — 25 Aug</span></td><td class="ask"><p>Is the Sumsub KYC link re-issuable, and does the applicant's progress persist if they close the webview or the app mid-verification? What is the link's expiry?</p></td><td class="ans"><p>— (new question, no prior code)</p></td><td class="fup"><p>Blockstream plans to open the KYC flow in an in-app webview. The flow assumes a user can leave mid-verification and resume — from the same link or a re-issued one — without losing progress. Please confirm link expiry and re-issue behaviour.</p></td></tr>
+<tr class="ldg-tr" data-status="new"><td class="ref"><span class="ldg-code">2.7</span><br><span class="ldg-pill new">New</span></td><td class="ask"><p>Is the Sumsub KYC link re-issuable, and does the applicant's progress persist if they close the webview or the app mid-verification? What is the link's expiry?</p></td><td class="ans"><p>— (new question, no prior code)</p></td><td class="fup"><p>Blockstream plans to open the KYC flow in an in-app webview. The flow assumes a user can leave mid-verification and resume — from the same link or a re-issued one — without losing progress. Please confirm link expiry and re-issue behaviour.</p></td></tr>
 </tbody></table></div>
         </section>
 
@@ -331,7 +343,7 @@
 <tr class="ldg-tr" data-status="dec"><td class="ref"><span class="ldg-code">4.5</span><br><span class="ldg-pill dec">Confirmed</span></td><td class="ask"><p>What's the network-fee structure, is it paid in BTC, how soon does the withdrawal broadcast after execution, and is it batched?</p></td><td class="ans"><p>The settlement fee is paid in BTC. We don't batch — transactions are subaccount-based, so each withdrawal is broadcast as its own transaction, on average around 30 minutes after execution.</p></td><td class="fup"><p>Blockstream is designing a pending-state UX for the ~30-minute broadcast window.</p></td></tr>
 <tr class="ldg-tr" data-status="dec"><td class="ref"><span class="ldg-code">4.6</span><br><span class="ldg-pill dec">Confirmed</span></td><td class="ask"><p>Does the €1,000 threshold apply per transaction or in aggregate, and are all self-hosted withdrawals verified regardless of amount?</p></td><td class="ans"><p>The €1,000 threshold is applied per transaction. We verify all self-hosted withdrawals regardless of amount.</p></td><td class="fup"><p>—</p></td></tr>
 <tr class="ldg-tr" data-status="dec"><td class="ref"><span class="ldg-code">4.7</span><br><span class="ldg-pill dec">Confirmed</span></td><td class="ask"><p>Can a registration be rejected on analytics grounds? Once verified, is an address whitelisted permanently, or does re-verification invalidate it?</p></td><td class="ans"><p>Once verified, an address is whitelisted permanently. For self-hosted wallets we require proof of ownership, confirmed via a penny test; this step is not a subject for any other analytics. KYC re-verification doesn't invalidate a whitelisted address, as long as the user's data doesn't change.</p></td><td class="fup"><p>—</p></td></tr>
-<tr class="ldg-tr" data-status="new"><td class="ref"><span class="ldg-code">4.8</span><br><span class="ldg-pill new">Not yet sent</span></td><td class="ask"><p>Does Hercle's own withdrawal/settlement trigger require a one-time passcode or equivalent step on Hercle's API?</p></td><td class="ans"><p>— (not yet sent to Hercle)</p></td><td class="fup"><p>New question, no prior code — the answer decides where Blockstream places its own security step in the buy-and-settle flow.</p></td></tr>
+<tr class="ldg-tr" data-status="new"><td class="ref"><span class="ldg-code">4.8</span><br><span class="ldg-pill new">New</span></td><td class="ask"><p>Does Hercle's own withdrawal/settlement trigger require a one-time passcode or equivalent step on Hercle's API?</p></td><td class="ans"><p>— (not yet sent to Hercle)</p></td><td class="fup"><p>New question, no prior code — the answer decides where Blockstream places its own security step in the buy-and-settle flow.</p></td></tr>
 </tbody></table></div>
         </section>
 
@@ -350,7 +362,7 @@
 </tbody></table></div>
         </section>
 
-        <p class="ldg-foot">31 questions from Hercle’s original response plus 2 new items (2.7 and 4.8), tracked as 31 entries (two pairs — 2.1/2.2 and 2.5/2.6 — were answered together): 19 decided, 12 outstanding, of which two (2.7, 4.8) are being sent to Hercle for the first time on 25 Aug.</p>
+        <p class="ldg-foot">31 questions from Hercle’s original response plus 2 new items (2.7 and 4.8), tracked as 31 entries (two pairs — 2.1/2.2 and 2.5/2.6 — were answered together): 19 decided, 12 outstanding, of which two (2.7, 4.8) are new — going to Hercle for the first time on 25 Aug.</p>
       </div>
     </div>
   </div>
@@ -996,15 +1008,23 @@
   scroller.addEventListener('scroll', onScroll, {passive:true});
   onScroll();
 
-  // status filter buttons
+  // status filter buttons — filter rows, and hide topics with no matching rows
   var filterBtns = Array.prototype.slice.call(document.querySelectorAll('#ldgFilters .ldg-fbtn'));
+  function applyFilter(f){
+    if(f === 'all') delete document.body.dataset.ldgfilter;
+    else document.body.dataset.ldgfilter = f;
+    Array.prototype.slice.call(document.querySelectorAll('.ldg-topic')).forEach(function(topic){
+      var visible = (f === 'all') ||
+        topic.querySelectorAll('.ldg-tr[data-status="' + f + '"]').length > 0;
+      topic.classList.toggle('ldg-hidden', !visible);
+    });
+    if(typeof onScroll === 'function') onScroll();
+  }
   filterBtns.forEach(function(btn){
     btn.addEventListener('click', function(){
       filterBtns.forEach(function(b){ b.classList.remove('on'); });
       btn.classList.add('on');
-      var f = btn.getAttribute('data-f');
-      if(f === 'all') delete document.body.dataset.ldgfilter;
-      else document.body.dataset.ldgfilter = f;
+      applyFilter(btn.getAttribute('data-f'));
     });
   });
 
